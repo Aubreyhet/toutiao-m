@@ -15,6 +15,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等
 // 例如：import 《组件名称》 from '《组件路径》'
+import { getArticles } from '@/api/article'
 
 export default {
   name: 'ArticlecList',
@@ -46,22 +47,17 @@ export default {
 
   // 方法集合
   methods: {
-    onLoad () {
-      // 异步更新数据
-      // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
-
-        // 加载状态结束
-        this.loading = false
-
-        // 数据全部加载完成
-        if (this.list.length >= 40) {
-          this.finished = true
-        }
-      }, 1000)
+    async onLoad () {
+      try {
+        const res = await getArticles({
+          channel_id: this.channel.id,
+          timestamp: Date.now(),
+          with_top: 1
+        })
+        console.log(res)
+      } catch (error) {
+        console.log('请求失败', error)
+      }
     }
   },
 
@@ -69,9 +65,7 @@ export default {
   created () {},
 
   // 生命周期 - 挂载完成（可以访问DOM元素
-  mounted () {
-    console.log(this.channel)
-  },
+  mounted () {},
 
   beforeCreate () {}, // 生命周期 - 创建之前
 
