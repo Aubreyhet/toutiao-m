@@ -10,3 +10,6 @@ body {
 .page-nav-bar .van-icon {
   color: #fff;
 }
+.van-nav-bar__title {
+  max-width: 100% !important;
+}
