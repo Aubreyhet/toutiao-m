@@ -4,7 +4,7 @@ import request from '@/utils/request'
 export const loginAPI = data => {
   return request({
     method: 'POST',
-    url: '/v1_0/authorizations',
+    url: '/app/v1_0/authorizations',
     data
   })
 }
@@ -13,6 +13,20 @@ export const loginAPI = data => {
 export const sendSms = mobile => {
   return request({
     method: 'GET',
-    url: `/v1_0/sms/codes/${mobile}`
+    url: `/app/v1_0/sms/codes/${mobile}`
+  })
+}
+
+/**
+ *  获取用户信息接口
+ */
+export const getUserInfo = () => {
+  return request({
+    method: 'GET',
+    url: '/app/v1_0/user'
+    // 该接口需要请求头验证 token
+    // headers: {
+    //   Authorization: `Bearer ${store.state.user.token}`
+    // }
   })
 }

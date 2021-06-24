@@ -10,6 +10,34 @@ const routes = [
     name: 'login',
     // 使用懒加载加载所需模块
     component: () => import('@/views/login')
+  },
+  {
+    path: '/',
+    // name: 'login', // 有了默认子路由之后 父路由无需配置name属性
+    // 使用懒加载加载所需模块
+    component: () => import('@/views/layout'),
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: () => import('@/views/home')
+      },
+      {
+        path: '/qa',
+        name: 'qa',
+        component: () => import('@/views/qa')
+      },
+      {
+        path: '/video',
+        name: 'video',
+        component: () => import('@/views/video')
+      },
+      {
+        path: '/my',
+        name: 'my',
+        component: () => import('@/views/my')
+      }
+    ]
   }
 ]
 
