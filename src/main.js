@@ -15,6 +15,9 @@ import './styles/icon.less'
 // 引入amfe-flexible做适配
 import 'amfe-flexible'
 
+// 导入时间处理模块
+import '@/utils/dayjs.js'
+
 // 使用vant
 Vue.use(Vant)
 

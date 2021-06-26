@@ -2,28 +2,28 @@
 <template>
 
   <van-cell class="article-index">
-    <div slot="title">{{ articleObj.title }}</div>
+    <div slot="title" class="van-multi-ellipsis--l2">{{ articleObj.title }}</div>
     <div slot="label">
-      <div v-if="articleObj.cover.type === 3">
-        <div v-for="(obj, index) in articleObj.cover.images" :key="index">
+      <div v-if="articleObj.cover.type === 3" class="cover-wrap">
+        <div v-for="(obj, index) in articleObj.cover.images" :key="index" class="cover-item">
           <van-image
-            width="100"
-            height="100"
+            class="cover-item-img"
             :src="obj"
+            fit='cover'
           />
         </div>
       </div>
-      <div>
+      <div class="art-aut">
           <span>{{ articleObj.aut_name }}</span>
           <span>{{ articleObj.comm_count }}</span>
-          <span>{{ articleObj.pubdate }}</span>
+          <span>{{ articleObj.pubdate | relativeTime }}</span>
         </div>
     </div>
     <van-image
         v-if="articleObj.cover.type === 1"
         slot="default"
-        width="100"
-        height="100"
+        class="right-cover"
+        fit='cover'
         :src="articleObj.cover.images[0]"
       />
   </van-cell>
@@ -86,5 +86,40 @@ export default {
 
 <style lang='less' scoped>
 // @import url(); 引入公共css类
-
+.article-index{
+  .title{
+    font-size: 32px;
+    color: #3a3a3a;
+  }
+  .van-cell__value{
+    flex: unset;
+    width: 232px;
+    height: 146px;
+    margin-left: 25px;
+  }
+  .right-cover{
+    width: 232px;
+    height: 146px;
+  }
+  .art-aut span{
+    font-size: 22px;
+    color: #b4b4b4;
+    margin-right: 25px;
+  }
+  .cover-wrap{
+    display: flex;
+    padding: 30px 0;
+    .cover-item{
+      flex: 1;
+      height: 146px;
+      &:not(:last-child){
+        padding-right: 4px;
+      }
+      .cover-item-img{
+        width: 100%;
+        height: 146px;
+      }
+    }
+  }
+}
 </style>
