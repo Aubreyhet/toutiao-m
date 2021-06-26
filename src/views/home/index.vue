@@ -19,10 +19,22 @@
         <ArticleList :channel="v"/>
       </van-tab>
       <div slot="nav-right" class="placeholder"></div>
-      <div slot="nav-right" class="hamhurger-btn">
+      <div slot="nav-right" class="hamhurger-btn" @click="popupIsShow=true">
         <i class="iconfont icon-gengduo"></i>
       </div>
     </van-tabs>
+
+    <!-- 弹出层 -->
+    <van-popup
+      v-model="popupIsShow"
+      round
+      closeable
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '90%' }"
+    >
+    <ChannelEdit></ChannelEdit>
+    </van-popup>
   </div>
 </template>
 
@@ -31,6 +43,7 @@
 // 例如：import 《组件名称》 from '《组件路径》'
 import { getUserChannels } from '@/api/user'
 import ArticleList from './components/articlelist'
+import ChannelEdit from './components/channeledit.vue'
 
 export default {
   name: 'HomeIndex',
@@ -39,14 +52,16 @@ export default {
 
   // import引入的组件需要注入到对象中才能使用
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
   },
 
   data () {
     // 这里存放数据
     return {
       active: 0,
-      channels: []
+      channels: [],
+      popupIsShow: false
     }
   },
 
