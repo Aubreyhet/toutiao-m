@@ -33,7 +33,7 @@
       position="bottom"
       :style="{ height: '90%' }"
     >
-    <ChannelEdit :channelArr='channels' :active='active'></ChannelEdit>
+    <ChannelEdit :channelArr='channels' :active='active' @updata-active='updataActiveFn'></ChannelEdit>
     </van-popup>
   </div>
 </template>
@@ -82,6 +82,10 @@ export default {
       } catch (error) {
         console.log(error.request)
       }
+    },
+    updataActiveFn (index, popupIsShow = true) {
+      this.active = index
+      this.popupIsShow = popupIsShow
     }
   },
 
