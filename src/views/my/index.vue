@@ -114,12 +114,13 @@ export default {
 
     // 获取个人用户信息
     async onGetUserInfo () {
-      try {
-        const res = await getUserInfo()
-        console.log(res.data.data)
-        this.userInfo = res.data.data
-      } catch (err) {
-        console.log(err)
+      if (this.user) {
+        try {
+          const res = await getUserInfo()
+          this.userInfo = res.data.data
+        } catch (err) {
+          console.log(err)
+        }
       }
     }
   },

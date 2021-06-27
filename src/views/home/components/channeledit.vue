@@ -32,7 +32,9 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等
 // 例如：import 《组件名称》 from '《组件路径》'
-import { getChannelList } from '@/api/channel.js'
+import { getChannelList, setChannelList, delChannelList } from '@/api/channel.js'
+import { mapState } from 'vuex'
+import { setItem } from '@/utils/storage.js'
 export default {
   name: 'ChannelIndex',
 
@@ -77,7 +79,8 @@ export default {
       // 2.使用数组的filter 过滤和find 方法
       // 数组filter 方法会返回一个数组
       return this.allChannelList.filter(item => !this.channelArr.find(chan => chan.id === item.id))
-    }
+    },
+    ...mapState(['user'])
   },
 
   // 监控data中的数据变化
@@ -93,9 +96,25 @@ export default {
         console.log(error)
       }
     },
-    addChannel (o) {
+    async addChannel (o) {
       this.channelArr.push(o)
+      // 数据push完之后进行判断是否登录状态 如果是未登录状态需要将数据存在本地 通过vuex 来查看user用户状态
+      if (this.user) {
+        // 如果是登录状态将数据存到云端
+        try {
+          await setChannelList({
+            id: o.id,
+            seq: this.channelArr.length
+          })
+        } catch (error) {
+          this.$toast('数据保存失败，请稍后重试')
+        }
+      } else {
+        // 如果是未登录状态 将数据存到本地
+        setItem('TOUTIAO_CHANNELS', this.channelArr)
+      }
     },
+
     // 点击我的频道去判断是完成状态还是编辑状态 然后做出相应动作
     channelSelfFn (obj, index) {
       if (this.isEdit) {
@@ -105,6 +124,9 @@ export default {
         }
         // 做删除操作
         this.channelArr.splice(index, 1)
+
+        // 做实际删除操作
+        this.delchannelFn(obj)
         // 如果删除的是获取焦点之前的频道 要将选中的active加一操作, 但是编辑框不能隐藏掉需要继续显示
         if (index < this.active) {
           this.$emit('updata-active', index, true)
@@ -112,6 +134,22 @@ export default {
       } else {
         // 非编辑状态 就跳转到相应的频道  需要调用父组件的自定义事件
         this.$emit('updata-active', index, false)
+      }
+    },
+
+    async delchannelFn (o) {
+      try {
+        if (this.user) {
+          // 如果用户登录状态
+          console.log(o)
+          await delChannelList(o.id)
+        } else {
+          // 用户未登录状态
+          // 将数据更新到本地
+          setItem('TOUTIAO_CHANNELS', this.channelArr)
+        }
+      } catch (error) {
+        this.$toast('数据更新失败，请稍后重试')
       }
     }
   },

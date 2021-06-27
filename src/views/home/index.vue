@@ -44,6 +44,8 @@
 import { getUserChannels } from '@/api/user'
 import ArticleList from './components/articlelist'
 import ChannelEdit from './components/channeledit.vue'
+import { getItem } from '@/utils/storage'
+import { mapState } from 'vuex'
 
 export default {
   name: 'HomeIndex',
@@ -67,7 +69,9 @@ export default {
   },
 
   // 监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapState(['user'])
+  },
 
   // 监控data中的数据变化
   watch: {},
@@ -76,12 +80,23 @@ export default {
   methods: {
     // 调用获取用户频道的接口
     async getUserChannelsFn () {
+      let channels = []
       try {
-        const { data } = await getUserChannels()
-        this.channels = data.data.channels
+        if (this.user) {
+          const { data } = await getUserChannels()
+          channels = data.data.channels
+        } else {
+          if (getItem('TOUTIAO_CHANNELS')) {
+            channels = getItem('TOUTIAO_CHANNELS')
+          } else {
+            const { data } = await getUserChannels()
+            channels = data.data.channels
+          }
+        }
       } catch (error) {
         console.log(error.request)
       }
+      this.channels = channels
     },
     updataActiveFn (index, popupIsShow = true) {
       this.active = index
