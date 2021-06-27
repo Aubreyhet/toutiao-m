@@ -33,7 +33,7 @@
       position="bottom"
       :style="{ height: '90%' }"
     >
-    <ChannelEdit></ChannelEdit>
+    <ChannelEdit :channelArr='channels' :active='active'></ChannelEdit>
     </van-popup>
   </div>
 </template>
@@ -60,6 +60,7 @@ export default {
     // 这里存放数据
     return {
       active: 0,
+      // 首页频道列表
       channels: [],
       popupIsShow: false
     }

@@ -6,7 +6,16 @@
       <van-button type="danger" plain round size="mini" class="edit-btn"> 编辑 </van-button>
     </van-cell>
     <van-grid :gutter="10" class="grid-item">
-      <van-grid-item v-for="value in 6" :key="value" text="文字" />
+      <van-grid-item v-for="(obj, index) in channelArr" :key="index" icon="close">
+        <span slot="text" class="text" :class="{active: index == active}">{{ obj.name }}</span>
+      </van-grid-item>
+    </van-grid>
+
+    <van-cell :border='false'>
+      <div slot="title" class="title-text">频道推荐</div>
+    </van-cell>
+    <van-grid :gutter="10" class="grid-item">
+      <van-grid-item v-for="value in 6" :key="value" text="文字推荐" icon="plus"/>
     </van-grid>
   </div>
 </template>
@@ -18,7 +27,16 @@
 export default {
   name: 'ChannelIndex',
 
-  props: {},
+  props: {
+    channelArr: {
+      type: Array,
+      required: true
+    },
+    active: {
+      type: Number,
+      required: true
+    }
+  },
 
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -74,14 +92,32 @@ export default {
     color: #f85959;
     border: 1px solid #f85959;
   }
-  /deep/ .grid-item{
+  /deep/ .van-grid-item{
+    .van-icon-close{
+      font-size: 40px;
+      position: absolute;
+      top: -15px;
+      right: -15px;
+      color: #cacaca;
+      z-index: 2;
+     }
     width: 160px;
     height: 86px;
     .van-grid-item__content{
+      flex-direction: row;
       background: #f4f5f6;
-      .van-grid-item__text{
+      white-space: nowrap;
+      .van-icon-plus{
+        font-size: 28px;
+        margin-right: 4px;
+      }
+      .van-grid-item__text, .text{
         font-size: 28px;
         color: #222;
+        margin-top: 0;
+      }
+      .active{
+        color: red;
       }
     }
   }
