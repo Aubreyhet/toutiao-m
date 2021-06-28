@@ -1,7 +1,7 @@
 <!-- 文章列表项 -->
 <template>
 
-  <van-cell class="article-index">
+  <van-cell class="article-index" :to="`/article/${articleObj.art_id}`">
     <div slot="title" class="van-multi-ellipsis--l2">{{ articleObj.title }}</div>
     <div slot="label">
       <div v-if="articleObj.cover.type === 3" class="cover-wrap">
