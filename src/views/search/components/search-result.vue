@@ -60,9 +60,6 @@ export default {
           per_page: this.perPage,
           q: this.searchText
         })
-        if (Math.random() > 0.5) {
-          JSON.parse('jugiugkjhi')
-        }
         const { results } = data.data
         this.list.push(...results)
         // 加载状态结束

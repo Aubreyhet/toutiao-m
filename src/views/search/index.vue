@@ -21,7 +21,7 @@
     <!-- 搜索联想 -->
     <SearchSugges @search='onSearch' :searchText='searchText' v-else-if="searchText"></SearchSugges>
     <!-- 搜索历史 -->
-    <SearchHistory v-else></SearchHistory>
+    <SearchHistory @clearAll='searchHistors = []' @search='onSearch' :searchHistors='searchHistors' v-else></SearchHistory>
   </div>
 </template>
 
@@ -31,6 +31,8 @@
 import SearchHistory from './components/search-history.vue'
 import SearchSugges from './components/search-suggestion.vue'
 import SearchResult from './components/search-result.vue'
+
+import { setItem, getItem } from '@/utils/storage'
 export default {
   name: 'SearchIndex',
 
@@ -47,7 +49,8 @@ export default {
     // 这里存放数据
     return {
       searchText: '',
-      searchIsShow: false
+      searchIsShow: false,
+      searchHistors: getItem('SEARCH_HISTORS') || []
     }
   },
 
@@ -55,7 +58,11 @@ export default {
   computed: {},
 
   // 监控data中的数据变化
-  watch: {},
+  watch: {
+    searchHistors (val) {
+      setItem('SEARCH_HISTORS', val)
+    }
+  },
 
   // 方法集合
   methods: {
@@ -64,6 +71,12 @@ export default {
     },
     onSearch (val) {
       this.searchText = val
+      // 在搜索结果显示前存储搜索记录 数据不能重复 将最新的数据存到数组的最前边
+      const index = this.searchHistors.indexOf(val)
+      if (index !== -1) {
+        this.searchHistors.splice(index, 1)
+      }
+      this.searchHistors.unshift(val)
       this.searchIsShow = true
     }
   },

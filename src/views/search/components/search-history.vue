@@ -2,31 +2,15 @@
 <template>
   <div class='search-history'>
     <van-cell title="搜索历史" icon="">
-      <span>全部删除</span>
-      <span>完成</span>
-      <template #right-icon>
-        <van-icon name="delete-o" class="delete-o" />
-      </template>
+      <div v-if="isDelete">
+        <span @click="$emit('clearAll')">全部删除</span>
+        &nbsp;&nbsp;
+        <span  @click="isDelete = false">完成</span>
+      </div>
+      <van-icon v-else slot="right-icon" name="delete-o" class="delete-o" @click="isDelete = true"/>
     </van-cell>
-    <van-cell title="单元格" icon="">
-      <template #right-icon>
-        <van-icon name="close" class="close" />
-      </template>
-    </van-cell>
-    <van-cell title="单元格" icon="">
-      <template #right-icon>
-        <van-icon name="close" class="close" />
-      </template>
-    </van-cell>
-    <van-cell title="单元格" icon="">
-      <template #right-icon>
-        <van-icon name="close" class="close" />
-      </template>
-    </van-cell>
-    <van-cell title="单元格" icon="">
-      <template #right-icon>
-        <van-icon name="close" class="close" />
-      </template>
+    <van-cell :title="obj" v-for="(obj, index) in searchHistors" :key="index">
+      <van-icon slot="right-icon" name="close" class="close" v-show="isDelete" @click='deleteFn(obj, index)'/>
     </van-cell>
   </div>
 </template>
@@ -38,14 +22,21 @@
 export default {
   name: 'HistoryIndex',
 
-  props: {},
+  props: {
+    searchHistors: {
+      type: Array,
+      required: true
+    }
+  },
 
   // import引入的组件需要注入到对象中才能使用
   components: {},
 
   data () {
     // 这里存放数据
-    return {}
+    return {
+      isDelete: false
+    }
   },
 
   // 监听属性 类似于data概念
@@ -55,7 +46,15 @@ export default {
   watch: {},
 
   // 方法集合
-  methods: {},
+  methods: {
+    deleteFn (obj, index) {
+      if (this.isDelete) {
+        this.searchHistors.splice(index, 1)
+      } else {
+        this.$emit('search', obj)
+      }
+    }
+  },
 
   // 生命周期 - 创建完成（可以访问当前this实例
   created () {},
