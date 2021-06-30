@@ -64,6 +64,7 @@
         <!-- 文章内容 -->
         <div class="article-content markdown-body" ref="artInfoBody" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
+        <CommentList :articleId='articleInfo.art_id' @comment-count='commentCount = $event.total_count'/>
         <!-- 底部区域 -->
         <div class="article-bottom">
           <van-button
@@ -74,7 +75,7 @@
           >写评论</van-button>
           <van-icon
             name="comment-o"
-            info="123"
+            :info="commentCount"
             color="#777"
           />
           <CollectArticle v-model="articleInfo.is_collected" :articleId='articleInfo.art_id'/>
@@ -110,11 +111,14 @@ import { ImagePreview } from 'vant'
 import { addFollow, delFollow } from '@/api/user'
 import CollectArticle from '@/components/collect-artcile.vue'
 import LikeArticle from '@/components/like-artcile.vue'
+import CommentList from './components/comment-list.vue'
+
 export default {
   name: 'ArticleIndex',
   components: {
     CollectArticle,
-    LikeArticle
+    LikeArticle,
+    CommentList
   },
   props: {
     articleId: {
@@ -127,7 +131,8 @@ export default {
       articleInfo: {}, // 文章数据
       errStatus: 0,
       loading: true,
-      isFollow: false
+      isFollow: false,
+      commentCount: 0
     }
   },
   computed: {},
