@@ -3,14 +3,17 @@
     <!-- 导航栏 -->
     <van-nav-bar
       class="page-nav-bar"
-      left-arrow
       title="黑马头条"
-    ></van-nav-bar>
+    >
+    <template #left>
+      <van-icon name="arrow-left" size="18" @click="$router.back()"/>
+    </template>
+    </van-nav-bar>
     <!-- /导航栏 -->
 
     <div class="main-wrap">
       <!-- 加载中 -->
-      <div class="loading-wrap">
+      <div class="loading-wrap" v-if="loading">
         <van-loading
           color="#3296fa"
           vertical
@@ -19,9 +22,9 @@
       <!-- /加载中 -->
 
       <!-- 加载完成-文章详情 -->
-      <div class="article-detail">
+      <div class="article-detail" v-else-if="articleInfo.title">
         <!-- 文章标题 -->
-        <h1 class="article-title">这是文章标题</h1>
+        <h1 class="article-title">{{ articleInfo.title }}</h1>
         <!-- /文章标题 -->
 
         <!-- 用户信息 -->
@@ -31,80 +34,88 @@
             slot="icon"
             round
             fit="cover"
-            src="https://img.yzcdn.cn/vant/cat.jpeg"
+            :src="articleInfo.aut_photo"
           />
-          <div slot="title" class="user-name">黑马头条号</div>
-          <div slot="label" class="publish-date">14小时前</div>
+          <div slot="title" class="user-name">{{ articleInfo.aut_name }}</div>
+          <div slot="label" class="publish-date">{{ articleInfo.pubdate | relativeTime}}</div>
+
           <van-button
+            v-if="articleInfo.is_followed"
+            class="follow-btn"
+            round
+            size="small"
+            @click="followFn"
+            :loading='isFollow'
+          >已关注</van-button>
+          <van-button
+            v-else
             class="follow-btn"
             type="info"
             color="#3296fa"
             round
             size="small"
             icon="plus"
+            @click="followFn"
+            :loading='isFollow'
           >关注</van-button>
-          <!-- <van-button
-            class="follow-btn"
-            round
-            size="small"
-          >已关注</van-button> -->
         </van-cell>
         <!-- /用户信息 -->
 
         <!-- 文章内容 -->
-        <div class="article-content">这是文章内容</div>
+        <div class="article-content markdown-body" ref="artInfoBody" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
+        <!-- 底部区域 -->
+        <div class="article-bottom">
+          <van-button
+            class="comment-btn"
+            type="default"
+            round
+            size="small"
+          >写评论</van-button>
+          <van-icon
+            name="comment-o"
+            info="123"
+            color="#777"
+          />
+          <CollectArticle v-model="articleInfo.is_collected" :articleId='articleInfo.art_id'/>
+          <LikeArticle v-model="articleInfo.attitude" :articleId='articleInfo.art_id'/>
+          <van-icon name="share" color="#777777"></van-icon>
+        </div>
+        <!-- /底部区域 -->
       </div>
       <!-- /加载完成-文章详情 -->
 
       <!-- 加载失败：404 -->
-      <div class="error-wrap">
+      <div class="error-wrap" v-else-if="errStatus == 404">
         <van-icon name="failure" />
         <p class="text">该资源不存在或已删除！</p>
       </div>
       <!-- /加载失败：404 -->
 
       <!-- 加载失败：其它未知错误（例如网络原因或服务端异常） -->
-      <div class="error-wrap">
+      <div class="error-wrap" v-else>
         <van-icon name="failure" />
         <p class="text">内容加载失败！</p>
-        <van-button class="retry-btn">点击重试</van-button>
+        <van-button class="retry-btn" @click="getArticleInfoById">点击重试</van-button>
       </div>
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
     </div>
 
-    <!-- 底部区域 -->
-    <div class="article-bottom">
-      <van-button
-        class="comment-btn"
-        type="default"
-        round
-        size="small"
-      >写评论</van-button>
-      <van-icon
-        name="comment-o"
-        info="123"
-        color="#777"
-      />
-      <van-icon
-        color="#777"
-        name="star-o"
-      />
-      <van-icon
-        color="#777"
-        name="good-job-o"
-      />
-      <van-icon name="share" color="#777777"></van-icon>
-    </div>
-    <!-- /底部区域 -->
   </div>
 </template>
 
 <script>
 import { getArticleInfo } from '@/api/article'
+import { ImagePreview } from 'vant'
+import { addFollow, delFollow } from '@/api/user'
+import CollectArticle from '@/components/collect-artcile.vue'
+import LikeArticle from '@/components/like-artcile.vue'
 export default {
   name: 'ArticleIndex',
-  components: {},
+  components: {
+    CollectArticle,
+    LikeArticle
+  },
   props: {
     articleId: {
       type: [Number, String, Object],
@@ -112,7 +123,12 @@ export default {
     }
   },
   data () {
-    return {}
+    return {
+      articleInfo: {}, // 文章数据
+      errStatus: 0,
+      loading: true,
+      isFollow: false
+    }
   },
   computed: {},
   watch: {},
@@ -122,14 +138,62 @@ export default {
   mounted () {},
   methods: {
     async getArticleInfoById () {
-      const { data } = await getArticleInfo(this.articleId)
-      console.log(data)
+      this.loading = true
+      try {
+        const { data } = await getArticleInfo(this.articleId)
+        this.articleInfo = data.data
+        console.log(this.articleInfo)
+        setTimeout(() => {
+          this.ImagePreviewfn()
+        }, 0)
+      } catch (error) {
+        if (error.response && error.response.status === 404) {
+          this.errStatus = 404
+        }
+      }
+      // 不管请求成功与失败 都应该将loading 状态设置为false
+      this.loading = false
+    },
+    ImagePreviewfn () {
+      const images = []
+      const imgNode = this.$refs.artInfoBody.querySelectorAll('img')
+      imgNode.forEach((ele, index) => {
+        images.push(ele.src)
+        ele.onclick = () => {
+          ImagePreview({
+            images,
+            startPosition: index
+          })
+        }
+      })
+    },
+    async followFn () {
+      this.isFollow = true
+      try {
+        // 如果是关注状态就 取消关注 反之添加关注
+        if (this.articleInfo.is_followed) {
+          const res = await delFollow(this.articleInfo.aut_id)
+          console.log(res)
+        } else {
+          await addFollow(this.articleInfo.aut_id)
+        }
+        this.articleInfo.is_followed = !this.articleInfo.is_followed
+      } catch (err) {
+        let errMessage = '请求失败，请稍后重试'
+        console.log(err.response)
+        if (err.response && err.response.status === 400) {
+          errMessage = '您自己不能关注自己'
+        }
+        this.$toast(errMessage)
+      }
+      this.isFollow = false
     }
   }
 }
 </script>
 
 <style scoped lang="less">
+@import './markdowncss.css';
 .article-container {
   .main-wrap {
     position: fixed;
@@ -195,7 +259,7 @@ export default {
     align-items: center;
     justify-content: center;
     background-color: #fff;
-    .van-icon {
+    /deep/ .van-icon {
       font-size: 122px;
       color: #b4b4b4;
     }
