@@ -6,9 +6,10 @@
       :finished="finished"
       finished-text="没有更多了"
       @load="onLoad"
+      :immediate-check="false"
     >
       <!-- <van-cell v-for="(item, index) in list" :key="index" :title="item.content" /> -->
-      <CommentItem v-for="(item, index) in list" :key="index" :item="item"></CommentItem>
+      <CommentItem v-for="(item, index) in list" :key="index" :item="item" @replyClick="$emit('replyClick', $event)"></CommentItem>
     </van-list>
   </div>
 </template>
@@ -29,6 +30,13 @@ export default {
     list: {
       type: Array,
       default: () => []
+    },
+    type: {
+      type: String,
+      validator (val) {
+        return ['a', 'c'].includes(val)
+      },
+      default: 'a'
     }
   },
 
@@ -58,15 +66,16 @@ export default {
     async onLoad () {
       try {
         // 1.异步获取数据
+        console.log('请求品论')
         const { data } = await getComments({
-          type: 'a', // 请求的数据类型 a是文章的评论 c是评论的评论
-          source: this.articleId, // 数据的id 如文章的id 或者评论的id
+          type: this.type, // 请求的数据类型 a是文章的评论 c是评论的评论
+          source: this.articleId.toString(), // 数据的id 如文章的id 或者评论的id
           offset: this.offset, // 获取文章的偏移量 默认是null
           limit: this.limit // 获取评论的条数
         })
         // 2.将数据赋值给变量
         const { results } = data.data
-        console.log(results)
+        console.log(this.articleId)
         // console.log(this.list)
         this.list.push(...results)
         // console.log(this.list)

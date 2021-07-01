@@ -24,6 +24,7 @@
         <van-button
           class="reply-btn"
           round
+          @click="$emit('replyClick', item)"
         >回复 {{item.reply_count}}</van-button>
       </div>
     </div>
@@ -101,6 +102,7 @@ export default {
     align-items: center;
   }
   .reply-btn {
+    white-space: nowrap;
     width: 135px;
     height: 48px;
     line-height: 48px;

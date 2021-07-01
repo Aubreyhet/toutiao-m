@@ -64,7 +64,7 @@
         <!-- 文章内容 -->
         <div class="article-content markdown-body" ref="artInfoBody" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
-        <CommentList :articleId='articleInfo.art_id' @comment-count='commentCount = $event.total_count' :list='commentList'/>
+        <CommentList :articleId='articleInfo.art_id' @replyClick='replyClickFn' @comment-count='commentCount = $event.total_count' :list='commentList'/>
         <!-- 底部区域 -->
         <div class="article-bottom">
           <van-button
@@ -105,7 +105,12 @@
         <van-button class="retry-btn" @click="getArticleInfoById">点击重试</van-button>
       </div>
       <!-- /加载失败：其它未知错误（例如网络原因或服务端异常） -->
+
     </div>
+    <!-- 评论恢复列表 -->
+    <van-popup v-model="isShow" position="bottom" style="height:90%">
+      <CommentReply :comment='thisComment' @close='closeFn'></CommentReply>
+    </van-popup>
 
   </div>
 </template>
@@ -118,6 +123,7 @@ import CollectArticle from '@/components/collect-artcile.vue'
 import LikeArticle from '@/components/like-artcile.vue'
 import CommentList from './components/comment-list.vue'
 import CommentPost from './components/comment-post.vue'
+import CommentReply from './components/comment-reply.vue'
 
 export default {
   name: 'ArticleIndex',
@@ -125,7 +131,8 @@ export default {
     CollectArticle,
     LikeArticle,
     CommentList,
-    CommentPost
+    CommentPost,
+    CommentReply
   },
   props: {
     articleId: {
@@ -141,7 +148,9 @@ export default {
       isFollow: false,
       commentCount: 0,
       posShow: false,
-      commentList: [] // 评论列表
+      commentList: [], // 评论列表
+      isShow: false,
+      thisComment: {} // 当前点击的评论项
     }
   },
   computed: {},
@@ -207,6 +216,13 @@ export default {
       this.posShow = false
       // 添加数据到评论列表
       this.commentList.unshift(nObj.data.new_obj)
+    },
+    replyClickFn (obj) {
+      this.thisComment = obj
+      this.isShow = true
+    },
+    closeFn () {
+      this.isShow = false
     }
   }
 }
