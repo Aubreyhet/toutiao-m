@@ -7,7 +7,8 @@
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <van-cell v-for="(item, index) in list" :key="index" :title="item.content" />
+      <!-- <van-cell v-for="(item, index) in list" :key="index" :title="item.content" /> -->
+      <CommentItem v-for="(item, index) in list" :key="index" :item="item"></CommentItem>
     </van-list>
   </div>
 </template>
@@ -16,6 +17,7 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等
 // 例如：import 《组件名称》 from '《组件路径》'
 import { getComments } from '@/api/comment.js'
+import CommentItem from './comment-item.vue'
 export default {
   name: 'CommentList',
 
@@ -23,16 +25,21 @@ export default {
     articleId: {
       type: [Number, String, Object],
       required: true
+    },
+    list: {
+      type: Array,
+      default: () => []
     }
   },
 
   // import引入的组件需要注入到对象中才能使用
-  components: {},
+  components: {
+    CommentItem
+  },
 
   data () {
     // 这里存放数据
     return {
-      list: [],
       loading: false,
       finished: false,
       offset: null,
@@ -59,7 +66,10 @@ export default {
         })
         // 2.将数据赋值给变量
         const { results } = data.data
+        console.log(results)
+        // console.log(this.list)
         this.list.push(...results)
+        // console.log(this.list)
         // 将请求回来的数据传给父组件
         this.$emit('comment-count', data.data)
         // 3.将loading设置为false
@@ -77,19 +87,19 @@ export default {
       }
       // 异步更新数据
       // setTimeout 仅做示例，真实场景中一般为 ajax 请求
-      setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          this.list.push(this.list.length + 1)
-        }
+      // setTimeout(() => {
+      //   for (let i = 0; i < 10; i++) {
+      //     this.list.push(this.list.length + 1)
+      //   }
 
-        // 加载状态结束
-        this.loading = false
+      //   // 加载状态结束
+      //   this.loading = false
 
-        // 数据全部加载完成
-        if (this.list.length >= 40) {
-          this.finished = true
-        }
-      }, 1000)
+      //   // 数据全部加载完成
+      //   if (this.list.length >= 40) {
+      //     this.finished = true
+      //   }
+      // }, 1000)
     }
   },
 

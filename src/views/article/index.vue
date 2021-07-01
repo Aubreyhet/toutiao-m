@@ -64,7 +64,7 @@
         <!-- 文章内容 -->
         <div class="article-content markdown-body" ref="artInfoBody" v-html="articleInfo.content"></div>
         <van-divider>正文结束</van-divider>
-        <CommentList :articleId='articleInfo.art_id' @comment-count='commentCount = $event.total_count'/>
+        <CommentList :articleId='articleInfo.art_id' @comment-count='commentCount = $event.total_count' :list='commentList'/>
         <!-- 底部区域 -->
         <div class="article-bottom">
           <van-button
@@ -72,6 +72,7 @@
             type="default"
             round
             size="small"
+            @click="posShow = true"
           >写评论</van-button>
           <van-icon
             name="comment-o"
@@ -82,6 +83,10 @@
           <LikeArticle v-model="articleInfo.attitude" :articleId='articleInfo.art_id'/>
           <van-icon name="share" color="#777777"></van-icon>
         </div>
+
+        <van-popup v-model="posShow" position="bottom">
+          <CommentPost :target='articleId' @posted-succes='postsuFn'></CommentPost>
+        </van-popup>
         <!-- /底部区域 -->
       </div>
       <!-- /加载完成-文章详情 -->
@@ -112,13 +117,15 @@ import { addFollow, delFollow } from '@/api/user'
 import CollectArticle from '@/components/collect-artcile.vue'
 import LikeArticle from '@/components/like-artcile.vue'
 import CommentList from './components/comment-list.vue'
+import CommentPost from './components/comment-post.vue'
 
 export default {
   name: 'ArticleIndex',
   components: {
     CollectArticle,
     LikeArticle,
-    CommentList
+    CommentList,
+    CommentPost
   },
   props: {
     articleId: {
@@ -132,7 +139,9 @@ export default {
       errStatus: 0,
       loading: true,
       isFollow: false,
-      commentCount: 0
+      commentCount: 0,
+      posShow: false,
+      commentList: [] // 评论列表
     }
   },
   computed: {},
@@ -192,6 +201,12 @@ export default {
         this.$toast(errMessage)
       }
       this.isFollow = false
+    },
+    postsuFn (nObj) {
+      // 关闭弹框
+      this.posShow = false
+      // 添加数据到评论列表
+      this.commentList.unshift(nObj.data.new_obj)
     }
   }
 }
