@@ -109,7 +109,7 @@
     </div>
     <!-- 评论恢复列表 -->
     <van-popup v-model="isShow" position="bottom" style="height:90%">
-      <CommentReply :comment='thisComment' @close='closeFn'></CommentReply>
+      <CommentReply v-if="isShow" :comment='thisComment' @close='closeFn'></CommentReply>
     </van-popup>
 
   </div>
@@ -133,6 +133,11 @@ export default {
     CommentList,
     CommentPost,
     CommentReply
+  },
+  provide: function () {
+    return {
+      articleId: this.articleInfo.art_id
+    }
   },
   props: {
     articleId: {

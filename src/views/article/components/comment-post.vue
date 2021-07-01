@@ -29,6 +29,7 @@ export default {
       required: true
     }
   },
+  inject: ['articleId'],
   data () {
     return {
       message: ''
@@ -42,17 +43,18 @@ export default {
     async sendComment () {
       try {
         const data = await addComment({
-          target: this.target,
+          target: this.target.toString(),
           content: this.message,
-          art_id: null
+          art_id: this.articleId ? this.articleId.toString() : null
         })
-        // console.log(data.data)
+        console.log(this.articleId, this.message)
         // 发布成功之后操作
         // 关闭tankuang调用父组件自定义事件 将返回的数据传过去
         this.message = ''
         this.$emit('posted-succes', data.data)
         this.$toast.success('评论成功')
       } catch (err) {
+        console.log(err.response)
         this.$toast.fail('操作失败，请稍后重试')
       }
     }

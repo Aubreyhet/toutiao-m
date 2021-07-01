@@ -6,9 +6,19 @@
     >
     <van-icon slot="left" name="cross" @click="$emit('close')"/>
     </van-nav-bar>
-    <CommentItem :item='comment'></CommentItem>
-    <van-cell title="全部回复"></van-cell>
-    <CommentList :articleId='comment.com_id' type='c'></CommentList>
+    <div class="solle-box">
+      <CommentItem :item='comment'></CommentItem>
+      <van-cell title="全部回复"></van-cell>
+      <CommentList :articleId='comment.com_id' :list='comments' type='c'></CommentList>
+    </div>
+
+    <div class="reply-box">
+      <van-button size="small" round class="rep-btn" @click="posShow=true">发表评论</van-button>
+    </div>
+
+    <van-popup v-model="posShow" position="bottom">
+      <CommentPost :target='comment.com_id' @posted-succes='postsuFn'></CommentPost>
+    </van-popup>
   </div>
 </template>
 
@@ -17,6 +27,7 @@
 // 例如：import 《组件名称》 from '《组件路径》'
 import CommentItem from './comment-item.vue'
 import CommentList from './comment-list.vue'
+import CommentPost from './comment-post.vue'
 export default {
   name: 'CommentReply',
 
@@ -30,12 +41,16 @@ export default {
   // import引入的组件需要注入到对象中才能使用
   components: {
     CommentItem,
-    CommentList
+    CommentList,
+    CommentPost
   },
 
   data () {
     // 这里存放数据
-    return {}
+    return {
+      posShow: false,
+      comments: []
+    }
   },
 
   // 监听属性 类似于data概念
@@ -45,7 +60,14 @@ export default {
   watch: {},
 
   // 方法集合
-  methods: {},
+  methods: {
+    postsuFn (data) {
+      // 关闭弹框
+      this.posShow = false
+      // 添加数据到评论列表
+      this.comments.unshift(data.data.new_obj)
+    }
+  },
 
   // 生命周期 - 创建完成（可以访问当前this实例
   created () {},
@@ -71,5 +93,27 @@ export default {
 
 <style lang='less' scoped>
 // @import url(); 引入公共css类
-
+.solle-box{
+  position: fixed;
+  top: 240px;
+  bottom: 88px;
+  left: 0;
+  right: 0;
+  overflow-y: auto;
+}
+.reply-box{
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 88px;
+  background: #fff;
+  border-top: 2px solid #ccc;
+  .rep-btn{
+    width: 60%;
+  }
+}
 </style>
