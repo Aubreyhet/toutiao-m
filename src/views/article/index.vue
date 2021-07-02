@@ -4,10 +4,9 @@
     <van-nav-bar
       class="page-nav-bar"
       title="黑马头条"
+      left-arrow
+      @click-left="$router.back()"
     >
-    <template #left>
-      <van-icon name="arrow-left" size="18" @click="$router.back()"/>
-    </template>
     </van-nav-bar>
     <!-- /导航栏 -->
 

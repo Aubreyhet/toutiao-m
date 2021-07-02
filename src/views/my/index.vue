@@ -22,7 +22,7 @@
           <span class="name">{{ userInfo.name }}</span>
         </div>
         <div class="right">
-          <van-button size="mini" plain round>编辑资料</van-button>
+          <van-button size="mini" plain round to="/user/profile">编辑资料</van-button>
         </div>
       </div>
 
@@ -99,8 +99,8 @@ export default {
     onlogout () {
       // 点击退出登录 退出当前登录状态 删除user数据
       this.$dialog.confirm({
-        title: '标题',
-        message: '弹窗内容'
+        title: '退出登录',
+        message: '确认退出登录？'
       })
         .then(() => {
           // 点击确认按钮 退出登录 清除用户信息
